@@ -5,6 +5,7 @@ import (
 	"log"
 	"net"
 
+	tcpParser "github.com/devxdh/http-from-scratch/pkg/parser"
 	"github.com/devxdh/http-from-scratch/pkg/stream"
 )
 
@@ -16,20 +17,23 @@ func handleConnection(conn net.Conn) {
 
 	reader := stream.NewReader(conn)
 
-	for {
-		line, err := reader.ReadLine()
-		if err != nil {
-			fmt.Printf("[SERVER] Client disconnected (%s): %v\n", clientAddr, err)
-			return
-		}
-
-		if line == "" {
-			fmt.Println("[SERVER] End of HTTP headers reached.")
-			break
-		}
+	req, err := tcpParser.ParseRequest(reader)
+	if err != nil {
+		fmt.Printf("[SERVER] Error parsing request from %s: %v\n", clientAddr, err)
+		return
 	}
 
-	fmt.Printf("[SERVER] finished reading from %s\n", clientAddr)
+	fmt.Printf("[SERVER] Successfully parsed request from %s:\n", clientAddr)
+	fmt.Printf("  Method:  %s\n", req.Method)
+	fmt.Printf("  Path:    %s\n", req.Path)
+	fmt.Printf("  Version: %s\n", req.Version)
+	fmt.Printf("  Headers: %+v\n", req.Headers)
+
+	if len(req.Body) > 0 {
+		fmt.Printf("  Body:    %s\n", string(req.Body))
+	} else {
+		fmt.Println("  Body:    <emtpy>")
+	}
 }
 
 func main() {
