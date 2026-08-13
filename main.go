@@ -5,7 +5,7 @@ import (
 	"log"
 	"net"
 
-	tcpParser "github.com/devxdh/http-from-scratch/pkg/parser"
+	"github.com/devxdh/http-from-scratch/pkg/request"
 	"github.com/devxdh/http-from-scratch/pkg/stream"
 )
 
@@ -17,7 +17,7 @@ func handleConnection(conn net.Conn) {
 
 	reader := stream.NewReader(conn)
 
-	req, err := tcpParser.ParseRequest(reader)
+	req, err := request.Parse(reader)
 	if err != nil {
 		fmt.Printf("[SERVER] Error parsing request from %s: %v\n", clientAddr, err)
 		return

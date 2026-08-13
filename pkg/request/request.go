@@ -1,6 +1,6 @@
-// Package tcpParser handles parsing of raw
-// tcp byte stream to meaningful http format.
-package tcpParser
+// Package request handles parsing of raw request
+// byte stream to meaningful http request format.
+package request
 
 import (
 	"fmt"
@@ -18,7 +18,7 @@ type Request struct {
 	Body    []byte
 }
 
-func ParseRequest(reader *stream.Reader) (*Request, error) {
+func Parse(reader *stream.Reader) (*Request, error) {
 	req := &Request{
 		Headers: make(map[string]string),
 	}
