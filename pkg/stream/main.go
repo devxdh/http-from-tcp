@@ -3,56 +3,37 @@
 package stream
 
 import (
-	"errors"
-	"fmt"
+	"bufio"
 	"io"
 	"strings"
 )
 
-// ReadRawStream takes a connection as an parameter
-// and returns a byte channel `<-chan []byte`.
-func ReadRawStream(conn io.ReadCloser) <-chan string {
-	streamChan := make(chan string, 1)
+type Reader struct {
+	buffered *bufio.Reader
+}
 
-	go func() {
-		// Closes both the connection and the channel
-		// after their purpose is served
-		defer conn.Close()
-		defer close(streamChan)
+func NewReader(r io.Reader) *Reader {
+	return &Reader{
+		buffered: bufio.NewReader(r),
+	}
+}
 
-		// Buffer which reads only 8 bytes at a time
-		recvBuf := make([]byte, 8)
-		var accumulator strings.Builder
+func (r *Reader) ReadExact(count int) ([]byte, error) {
+	buf := make([]byte, count)
 
-		for {
-			bytesRead, err := conn.Read(recvBuf)
+	_, err := io.ReadFull(r.buffered, buf)
+	if err != nil {
+		return nil, err
+	}
 
-			if bytesRead > 0 {
-				currentChunk := string(recvBuf[:bytesRead])
-				for _, char := range currentChunk {
-					if char == '\n' {
-						streamChan <- accumulator.String()
-						accumulator.Reset()
-					} else {
-						accumulator.WriteRune(char)
-					}
-				}
-			}
+	return buf, nil
+}
 
-			if err != nil {
-				if errors.Is(err, io.EOF) {
-					fmt.Println("Client disconnected!")
-					if accumulator.Len() > 0 {
-						streamChan <- accumulator.String()
-					}
+func (r *Reader) ReadLine() (string, error) {
+	lineBytes, err := r.buffered.ReadBytes('\n')
+	if err != nil {
+		return strings.TrimRight(string(lineBytes), "\r\n"), err
+	}
 
-					break
-				}
-				fmt.Printf("Read error: %v\n", err)
-				break
-			}
-		}
-	}()
-
-	return streamChan
+	return strings.TrimRight(string(lineBytes), "\r\n"), nil
 }

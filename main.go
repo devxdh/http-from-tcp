@@ -8,6 +8,30 @@ import (
 	"github.com/devxdh/http-from-scratch/pkg/stream"
 )
 
+func handleConnection(conn net.Conn) {
+	defer conn.Close()
+
+	clientAddr := conn.RemoteAddr().String()
+	fmt.Printf("[SERVER] Client connected: %s\n", clientAddr)
+
+	reader := stream.NewReader(conn)
+
+	for {
+		line, err := reader.ReadLine()
+		if err != nil {
+			fmt.Printf("[SERVER] Client disconnected (%s): %v\n", clientAddr, err)
+			return
+		}
+
+		if line == "" {
+			fmt.Println("[SERVER] End of HTTP headers reached.")
+			break
+		}
+	}
+
+	fmt.Printf("[SERVER] finished reading from %s\n", clientAddr)
+}
+
 func main() {
 	listener, err := net.Listen("tcp", ":8080")
 	if err != nil {
@@ -22,13 +46,6 @@ func main() {
 			continue
 		}
 
-		fmt.Println("[SERVER] Client Connected!")
-		streamedChan := stream.ReadRawStream(conn)
-
-		for line := range streamedChan {
-			fmt.Println("read: ", line)
-		}
-
-		fmt.Println("[SERVER] Client session finished. Waiting for next connection...")
+		go handleConnection(conn)
 	}
 }
