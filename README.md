@@ -82,6 +82,6 @@ curl -i -X POST http://localhost:8080/users \
 
 ## The Takeaway
 
-Building this taught me one big lesson: the web isn't abstract magic. It's a simple, strict conversation between two machines that agree on where to put line breaks (`\r\n`), how to count bytes (`Content-Length`), and when to hang up the phone. It's just an agreement on how the conversation between two computers should be carried out and in what format that is it.
+Building this taught me one big lesson: the web isn't abstract magic. It's a simple, strict conversation between two machines that agree on where to put line breaks (`\r\n`), how to count bytes (`Content-Length`), and when to hang up the phone. It's just an agreement on how the conversation between two computers should be carried out and in what format, that's it.
 
 ---
