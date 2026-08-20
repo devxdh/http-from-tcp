@@ -31,9 +31,6 @@ func (r *Reader) ReadExact(count int) ([]byte, error) {
 
 func (r *Reader) ReadLine() (string, error) {
 	lineBytes, err := r.buffered.ReadBytes('\n')
-	if err != nil {
-		return strings.TrimRight(string(lineBytes), "\r\n"), err
-	}
-
-	return strings.TrimRight(string(lineBytes), "\r\n"), nil
+	trimmed := strings.TrimRight(string(lineBytes), "\r\n")
+	return trimmed, err
 }
