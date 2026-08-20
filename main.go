@@ -34,7 +34,7 @@ func handleConnection(conn net.Conn) {
 	switch req.Path {
 	case "/":
 		res.SetStatus(200)
-		res.SetBody([]byte("Welcome to my scratch HTTP Server!"), "text/plain")
+		res.SetBody([]byte("This is super horsey TCP/IP.\nRight now being ridden by the\nlegendary jockey, MR HTTP."), "text/plain")
 
 	case "/users":
 		res.SetStatus(200)

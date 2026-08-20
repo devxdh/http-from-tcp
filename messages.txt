@@ -1,5 +1,0 @@
-START
-This message is a test data sent to
-you for checking if our logic works
-or not.
-END
